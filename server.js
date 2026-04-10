@@ -114,6 +114,13 @@ function getUserCount(roomId){
 
 }
 
+function getRoomUsernames(roomId) {
+  if (!rooms[roomId]) return [];
+  return Array.from(rooms[roomId])
+    .map(socketId => socketMeta[socketId]?.username)
+    .filter(Boolean);
+}
+
 /* ================= ROUTES ================= */
 
 app.get('/', (req,res)=>{
@@ -227,6 +234,8 @@ io.on('connection',(socket)=>{
     socket.emit('joined',{
       username:cleanName
     });
+
+    socket.emit('user-list', getRoomUsernames(roomId));
 
     socket.to(roomId).emit(
       'user-joined',
