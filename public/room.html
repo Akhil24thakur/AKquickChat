@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>QuickChat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="room-page">
+
+<!-- JOIN OVERLAY -->
+<div class="overlay" id="join-overlay">
+  <div class="overlay-card">
+    <a href="/" class="overlay-logo">
+      <div class="logo-mark sm">Q</div>
+      <span class="logo-text">QuickChat</span>
+    </a>
+    <h2>Enter your name</h2>
+    <p class="overlay-sub">Joining room <code id="overlay-room-id"></code></p>
+    <input type="text" id="name-input" class="name-input" placeholder="Your name…" maxlength="30"
+      onkeydown="if(event.key==='Enter')joinChat()" autofocus autocomplete="off" />
+    <button class="btn-main" onclick="joinChat()">
+      Join chat
+      <svg class="btn-arrow" viewBox="0 0 20 20" fill="currentColor"><path d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"/></svg>
+    </button>
+    <div class="overlay-error" id="overlay-error" style="display:none"></div>
+  </div>
+</div>
+
+<!-- CHAT APP -->
+<div class="chat-app" id="chat-app" style="display:none">
+
+  <!-- SIDEBAR (desktop) / PANEL (mobile via toggle) -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+      <a href="/" class="sidebar-logo">
+        <div class="logo-mark sm">Q</div>
+        <span class="sidebar-logo-text">QuickChat</span>
+      </a>
+      <!-- Mobile close -->
+      <button class="sidebar-close" id="sidebar-close" onclick="closeSidebar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <!-- Room link section -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Room link</div>
+      <div class="link-display" id="link-display"></div>
+      <button class="copy-link-btn" id="copy-link-btn" onclick="copyLink()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        <span id="copy-btn-label">Copy link</span>
+      </button>
+    </div>
+
+    <!-- Online users -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">
+        Online
+        <span class="online-count-badge" id="online-badge">1</span>
+      </div>
+      <div class="users-list" id="users-list">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <div class="sidebar-spacer"></div>
+
+    <!-- Leave -->
+    <button class="sidebar-leave" onclick="window.location.href='/'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Leave room
+    </button>
+  </aside>
+
+  <!-- Overlay backdrop for mobile sidebar -->
+  <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="closeSidebar()"></div>
+
+  <!-- MAIN CHAT -->
+  <div class="chat-main">
+
+    <!-- Header -->
+    <div class="chat-header">
+      <div class="chat-header-left">
+        <!-- Mobile menu toggle -->
+        <button class="mobile-menu-btn" onclick="openSidebar()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="chat-room-name">
+          <span class="chat-room-label">Room</span>
+          <span class="chat-room-id" id="header-room-id"></span>
+        </div>
+      </div>
+      <div class="chat-header-right">
+        <div class="header-online">
+          <div class="online-dot"></div>
+          <span id="header-count">1 online</span>
+        </div>
+        <button class="header-copy-btn" onclick="copyLink()">Copy link</button>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="messages" id="messages">
+      <div class="messages-start">Beginning of conversation</div>
+    </div>
+
+    <!-- Typing indicator -->
+    <div class="typing-bar" id="typing-bar"></div>
+
+    <!-- Input -->
+    <div class="chat-input-wrap">
+      <div class="chat-input-box">
+        <textarea
+          id="msg-input"
+          class="msg-textarea"
+          placeholder="Message…"
+          rows="1"
+          maxlength="1000"
+          onkeydown="handleKey(event)"
+          oninput="handleInput(this)"
+        ></textarea>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+      <div class="input-hint">Enter to send &nbsp;·&nbsp; Shift+Enter for new line</div>
+    </div>
+
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/room.js"></script>
+</body>
+</html>

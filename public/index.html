@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>QuickChat — instant rooms, zero accounts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body class="home-page">
+
+<div class="bg-grid"></div>
+
+<main class="home-wrap">
+
+  <header class="home-header">
+    <div class="logo-mark">Q</div>
+    <span class="logo-text">QuickChat</span>
+  </header>
+
+  <section class="hero">
+    <h1>Chat rooms,<br/><em>instantly.</em></h1>
+    <p class="hero-sub">Create a room in one click. Share the link. No accounts, no downloads, no friction.</p>
+  </section>
+
+  <!-- Error banner -->
+  <div class="error-banner" id="error-banner" style="display:none">
+    Room not found or has expired. Try a different code.
+  </div>
+
+  <div class="home-cards">
+
+    <!-- Create card -->
+    <div class="card card-create">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      </div>
+      <h2>New room</h2>
+      <p>Spin up a fresh chat room. Get a shareable link instantly.</p>
+      <button class="btn-main" id="create-btn" onclick="createRoom()">
+        <span id="create-label">Create room</span>
+        <svg class="btn-arrow" viewBox="0 0 20 20" fill="currentColor"><path d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"/></svg>
+      </button>
+    </div>
+
+    <!-- Join card -->
+    <div class="card card-join">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+      </div>
+      <h2>Join a room</h2>
+      <p>Got a room code or link? Paste it below and jump in.</p>
+      <div class="join-field">
+        <input type="text" id="room-code-input" placeholder="Room code e.g. aB93kLm1" maxlength="200"
+          onkeydown="if(event.key==='Enter')joinRoom()" autocomplete="off" autocorrect="off" autocapitalize="off" />
+        <button class="btn-join" onclick="joinRoom()">Join →</button>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="home-footer">
+    Rooms expire after 24 hours &nbsp;·&nbsp; No data stored beyond chat history
+  </footer>
+
+</main>
+
+<script>
+  // Check for error param
+  const params = new URLSearchParams(location.search);
+  if (params.get('error') === 'notfound') {
+    document.getElementById('error-banner').style.display = 'block';
+  }
+
+  async function createRoom() {
+    const btn = document.getElementById('create-btn');
+    const label = document.getElementById('create-label');
+    btn.disabled = true;
+    label.textContent = 'Creating…';
+    try {
+      const res = await fetch('/api/create-room', { method: 'POST' });
+      const data = await res.json();
+      window.location.href = '/room/' + data.roomId;
+    } catch(e) {
+      label.textContent = 'Create room';
+      btn.disabled = false;
+      alert('Could not create room. Is the server running?');
+    }
+  }
+
+  function joinRoom() {
+    const input = document.getElementById('room-code-input');
+    const code = input.value.trim();
+    if (!code) { input.focus(); return; }
+    // Accept full URLs too
+    const match = code.match(/room\/([A-Za-z0-9]+)/);
+    const roomId = match ? match[1] : code;
+    window.location.href = '/room/' + roomId;
+  }
+</script>
+</body>
+</html>
