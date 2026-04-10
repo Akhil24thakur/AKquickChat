@@ -263,8 +263,26 @@ body {
 .room-page { overflow: hidden; }
 
 .chat-app {
-  height: 100vh; width: 100%;
+  height: calc(var(--vh, 1vh) * 100);
+  width: 100%;
   display: flex; overflow: hidden;
+}
+
+.chat-main {
+  flex: 1; min-height: 0; position: relative;
+}
+
+.messages {
+  flex: 1; min-height: 0; overflow-y: auto;
+  padding: 18px 16px 8px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+
+.chat-input-wrap {
+  position: sticky; bottom: 0; z-index: 2;
+  padding: 10px 12px 14px;
+  border-top: 1px solid var(--border);
+  background: var(--bg); flex-shrink: 0;
 }
 
 /* ── Sidebar ──────────────────────────────────── */
@@ -624,7 +642,7 @@ body {
   }
 
   /* Ensure input area stays above backdrop */
-  .chat-input-wrap { position: relative; z-index: 10; }
+  .chat-input-wrap { position: sticky; z-index: 10; }
   .chat-main { position: relative; z-index: 1; }
 
   /* Messages take full width */

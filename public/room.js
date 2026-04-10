@@ -16,6 +16,14 @@ const messagesEl    = document.getElementById('messages');
 const msgInput      = document.getElementById('msg-input');
 const typingBar     = document.getElementById('typing-bar');
 
+function setViewportHeight() {
+  document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+}
+
+setViewportHeight();
+window.addEventListener('resize', setViewportHeight);
+window.addEventListener('orientationchange', setViewportHeight);
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 document.getElementById('overlay-room-id').textContent = roomId;
 document.getElementById('header-room-id').textContent  = roomId;
