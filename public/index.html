@@ -6,7 +6,7 @@
 <title>QuickChat — instant rooms, zero accounts</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="/style.css" />
+<link rel="stylesheet" href="/css/style.css" />
 </head>
 <body class="home-page">
 
@@ -65,38 +65,6 @@
 
 </main>
 
-<script>
-  // Check for error param
-  const params = new URLSearchParams(location.search);
-  if (params.get('error') === 'notfound') {
-    document.getElementById('error-banner').style.display = 'block';
-  }
-
-  async function createRoom() {
-    const btn = document.getElementById('create-btn');
-    const label = document.getElementById('create-label');
-    btn.disabled = true;
-    label.textContent = 'Creating…';
-    try {
-      const res = await fetch('/api/create-room', { method: 'POST' });
-      const data = await res.json();
-      window.location.href = '/room/' + data.roomId;
-    } catch(e) {
-      label.textContent = 'Create room';
-      btn.disabled = false;
-      alert('Could not create room. Is the server running?');
-    }
-  }
-
-  function joinRoom() {
-    const input = document.getElementById('room-code-input');
-    const code = input.value.trim();
-    if (!code) { input.focus(); return; }
-    // Accept full URLs too
-    const match = code.match(/room\/([A-Za-z0-9]+)/);
-    const roomId = match ? match[1] : code;
-    window.location.href = '/room/' + roomId;
-  }
-</script>
+<script src="/js/index.js"></script>
 </body>
 </html>
